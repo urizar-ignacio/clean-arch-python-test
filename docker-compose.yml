@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  main-app:
+    build: .
+    volumes:
+      - type: bind
+        source: .
+        target: /app
+    ports:
+      - 5000:5000

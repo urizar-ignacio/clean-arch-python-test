@@ -17,6 +17,7 @@ ENTITIES_DATA_TYPES = {
 
 ENTITIES_HEADERS = {
     "DEPARTMENTS": [
+        "id",
         "department"
     ],
     "HIRED_EMPLOYEES": [

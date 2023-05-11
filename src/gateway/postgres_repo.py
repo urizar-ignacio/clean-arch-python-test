@@ -2,6 +2,7 @@ from sqlalchemy import (column, table, create_engine, insert, select)
 
 # TABLES
 department_table = table("department",
+                         column("id"),
                          column("department"))
 hired_employee_table = table("hired_employee",
                              column("id"),

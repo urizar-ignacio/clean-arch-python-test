@@ -1,6 +1,7 @@
 from flask import request
 from flask_restful import Resource
 from src.gateway.postgres_repo import PostgresRepo
+from src.usecase.get_report import get_report
 from src.usecase.load_data import load_data_to_domain
 
 from csv import reader
@@ -36,6 +37,11 @@ def generic_post_method(domain, request):
         except ValueError as e:
             return {"ERROR": str(e)}, 500
         return result, 200
+    
+def generic_get_report(report_name):
+    postgres_repo = PostgresRepo()
+    results = get_report(postgres_repo, report_name)
+    return {"headers": results[0], "data": results[1]}
 
 class Jobs(Resource):
     DOMAIN = "JOBS"
@@ -81,3 +87,15 @@ class HiredEmployee(Resource):
 
     def post(self):
         return generic_post_method(self.DOMAIN, request)
+    
+class EmployeesByQuarter(Resource):
+    REPORT_NAME = "employees_by_quarter"
+
+    def get(self):
+        return generic_get_report(self.REPORT_NAME)
+
+class EmployeesOverMean(Resource):
+    REPORT_NAME = "employees_over_mean"
+
+    def get(self):
+        return generic_get_report(self.REPORT_NAME)

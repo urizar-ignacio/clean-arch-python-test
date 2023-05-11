@@ -1,11 +1,21 @@
 from sqlalchemy import (column, table, create_engine, insert, select)
 
 # TABLES
+department_table = table("department",
+                         column("department"))
+hired_employee_table = table("hired_employee",
+                             column("id"),
+                             column("name"),
+                             column("datetime"),
+                             column("department_id"),
+                             column("job_id"))
 job_table = table("job",
                   column("id"),
                   column("job"))
 
 DOMAIN_TABLES = {
+    "DEPARTMENTS": department_table,
+    "HIRED_EMPLOYEES": hired_employee_table,
     "JOBS": job_table,
 }
 

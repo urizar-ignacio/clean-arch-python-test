@@ -12,12 +12,32 @@ def file_object_to_list(file):
     rows = []
     csv_reader = reader(file_object)
     for row in csv_reader:
-        print(row, flush=True)
         rows.append(row)
     return rows
 
-class Jobs(Resource):
+def generic_post_method(domain, request):
+    if "file" not in request.files:
+            return {"BAD_REQUEST": "No file attached to POST request"}, 400
+        
+    file = request.files["file"]
+    if not file.filename.endswith(".csv"):
+        return {"BAD_REQUEST": "File extension not supported. Must be .csv"}, 400
+    
+    rows = file_object_to_list(file)
 
+    if len(rows) <= 0:
+        return {"BAD_REQUEST": "Empty file"}, 400
+    elif len(rows) > 1000:
+        return {"BAD_REQUEST": "Max number of records (1000) excedeed"}, 400
+    else:
+        postgres_repo = PostgresRepo()
+        try:
+            result = load_data_to_domain(domain, rows, postgres_repo)
+        except ValueError as e:
+            return {"ERROR": str(e)}, 500
+        return result, 200
+
+class Jobs(Resource):
     DOMAIN = "JOBS"
 
     def get(self):
@@ -30,19 +50,34 @@ class Jobs(Resource):
         }
     
     def post(self):
-        if "file" not in request.files:
-            return {"BAD_REQUEST": "No file attached to POST request"}, 400
-        
-        file = request.files["file"]
-        if not file.filename.endswith(".csv"):
-            return {"BAD_REQUEST": "File extension not supported. Must be .csv"}, 400
-        
-        print(type(file), flush=True)
-        rows = file_object_to_list(file)
+        return generic_post_method(self.DOMAIN, request)
 
-        if len(rows) > 0:
-            postgres_repo = PostgresRepo()
-            result = load_data_to_domain(self.DOMAIN, rows, postgres_repo)
-            return result, 200
-        else:
-            return {"BAD_REQUEST": "Empty file"}, 400
+class Department(Resource):
+    DOMAIN = "DEPARTMENTS"
+
+    def get(self):
+        return {
+            "RESOURCE": "departments",
+            "ALLOWED_METHODS": [
+                "GET",
+                "POST"
+            ]
+        }
+
+    def post(self):
+        return generic_post_method(self.DOMAIN, request)
+
+class HiredEmployee(Resource):
+    DOMAIN = "HIRED_EMPLOYEES"
+
+    def get(self):
+        return {
+            "RESOURCE": "hired_employees",
+            "ALLOWED_METHODS": [
+                "GET",
+                "POST"
+            ]
+        }
+
+    def post(self):
+        return generic_post_method(self.DOMAIN, request)

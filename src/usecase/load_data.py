@@ -1,19 +1,35 @@
+from src.entity.department import Department
+from src.entity.hired_employee import HiredEmployee
 from src.entity.job import Job
 from pydantic.error_wrappers import ValidationError
 
 ALLOWED_DOMAINS = [
+    "DEPARTMENTS",
+    "HIRED_EMPLOYEES",
     "JOBS",
 ]
 
 ENTITIES_DATA_TYPES = {
-    "JOBS": Job
+    "DEPARTMENTS": Department,
+    "HIRED_EMPLOYEES": HiredEmployee,
+    "JOBS": Job,
 }
 
 ENTITIES_HEADERS = {
+    "DEPARTMENTS": [
+        "department"
+    ],
+    "HIRED_EMPLOYEES": [
+        "id",
+        "name",
+        "datetime",
+        "department_id",
+        "job_id"
+    ],
     "JOBS": [
         "id",
         "job"
-    ]
+    ],
 }
 
 def load_data_to_domain(domain, records, repo):
@@ -33,5 +49,4 @@ def load_data_to_domain(domain, records, repo):
     if len(failed_records) > 0:
         print(f"This records does not meet Data Rules: {failed_records}", flush=True)
     result = repo.save(objects_to_load, domain)
-    print(objects_to_load, flush=True)
     return result
